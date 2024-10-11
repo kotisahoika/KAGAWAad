@@ -61,7 +61,7 @@
     <div id="message"></div>
 
     <script>
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwDHIdHXswGBUwdlZeU0zedo8hPmqD1EcS3nFZpGqRZnumq8i91uEVBAL0p4IpOqEWE/exec'; // GASのURLを設定
+        const GAS_URL = 'https://script.google.com/macros/s/あなたのスクリプトID/exec'; // GASのURLを設定
         const ADMIN_PASSWORD = 'kotisahoika2008'; // 管理者用のパスワード
 
         document.getElementById('loginButton').onclick = () => {
@@ -93,7 +93,13 @@
                     'Content-Type': 'application/json'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                // レスポンスの状態コードを確認
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(result => {
                 if (result.success) {
                     document.getElementById('message').innerText = '終了時刻が設定されました。'; // 成功メッセージ表示
