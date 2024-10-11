@@ -44,7 +44,7 @@
             color: #4CAF50;
         }
         #endTimeDiv {
-            display: none;
+            display: none; /* 初期状態では非表示 */
         }
     </style>
 </head>
@@ -61,23 +61,23 @@
     <div id="message"></div>
 
     <script>
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFFyaCZZ28vwZZlVTuV6Abp6Wgy6pSWpwxvj3AOPTX0uMtPYlBNgXwo3Dgd_Iaev8I/exec'; // GASのURL
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFFyaCZZ28vwZZlVTuV6Abp6Wgy6pSWpwxvj3AOPTX0uMtPYlBNgXwo3Dgd_Iaev8I/exec'; // GASのURLを設定
         const ADMIN_PASSWORD = 'kotisahoika2008'; // 管理者用のパスワード
 
         document.getElementById('loginButton').onclick = () => {
             const password = document.getElementById('passwordInput').value;
             if (password === ADMIN_PASSWORD) {
-                document.getElementById('endTimeDiv').style.display = 'block';
-                document.getElementById('message').innerText = '';
+                document.getElementById('endTimeDiv').style.display = 'block'; // 終了時刻設定フォームを表示
+                document.getElementById('message').innerText = ''; // メッセージをクリア
             } else {
-                document.getElementById('message').innerText = 'パスワードが間違っています。';
+                document.getElementById('message').innerText = 'パスワードが間違っています。'; // エラーメッセージ表示
             }
         };
 
         document.getElementById('setEndTimeButton').onclick = () => {
             const endTime = document.getElementById('endTimeInput').value;
             if (!endTime) {
-                document.getElementById('message').innerText = '終了時刻を入力してください。';
+                document.getElementById('message').innerText = '終了時刻を入力してください。'; // 入力エラーメッセージ表示
                 return;
             }
 
@@ -96,13 +96,13 @@
             .then(response => response.json())
             .then(result => {
                 if (result.success) {
-                    document.getElementById('message').innerText = '終了時刻が設定されました。';
+                    document.getElementById('message').innerText = '終了時刻が設定されました。'; // 成功メッセージ表示
                 } else {
-                    document.getElementById('message').innerText = '終了時刻の設定に失敗しました。';
+                    document.getElementById('message').innerText = '終了時刻の設定に失敗しました。'; // 失敗メッセージ表示
                 }
             })
             .catch(error => {
-                document.getElementById('message').innerText = 'エラーが発生しました。';
+                document.getElementById('message').innerText = 'エラーが発生しました: ' + error.message; // エラーメッセージ表示
                 console.error('Error:', error);
             });
         };
