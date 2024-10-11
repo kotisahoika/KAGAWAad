@@ -98,12 +98,11 @@
                 if (result.success) {
                     document.getElementById('message').innerText = '終了時刻が設定されました。'; // 成功メッセージ表示
                 } else {
-                    document.getElementById('message').innerText = '終了時刻の設定に失敗しました。'; // 失敗メッセージ表示
+                    document.getElementById('message').innerText = '終了時刻の設定に失敗しました: ' + result.error; // 失敗メッセージと詳細を表示
                 }
             })
             .catch(error => {
-                document.getElementById('message').innerText = 'エラーが発生しました: ' + error.message; // エラーメッセージ表示
-                console.error('Error:', error);
+                document.getElementById('message').innerText = 'エラーが発生しました: ' + error.message; // エラーの詳細を画面に表示
             });
         };
     </script>
