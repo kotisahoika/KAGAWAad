@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ページ</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        input {
+            padding: 10px;
+            font-size: 1em;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: white;
+            width: 80%;
+            max-width: 300px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 300px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #4CAF50;
+        }
+        #endTimeDiv {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>管理者ページ</h1>
+    <input type="password" id="passwordInput" placeholder="パスワードを入力">
+    <button id="loginButton">ログイン</button>
+    
+    <div id="endTimeDiv">
+        <h2>終了時刻を設定</h2>
+        <input type="datetime-local" id="endTimeInput">
+        <button id="setEndTimeButton">設定</button>
+    </div>
+    <div id="message"></div>
+
+    <script>
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFFyaCZZ28vwZZlVTuV6Abp6Wgy6pSWpwxvj3AOPTX0uMtPYlBNgXwo3Dgd_Iaev8I/exec'; // GASのURL
+        const ADMIN_PASSWORD = 'kotisahoika2008'; // 管理者用のパスワード
+
+        document.getElementById('loginButton').onclick = () => {
+            const password = document.getElementById('passwordInput').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('endTimeDiv').style.display = 'block';
+                document.getElementById('message').innerText = '';
+            } else {
+                document.getElementById('message').innerText = 'パスワードが間違っています。';
+            }
+        };
+
+        document.getElementById('setEndTimeButton').onclick = () => {
+            const endTime = document.getElementById('endTimeInput').value;
+            if (!endTime) {
+                document.getElementById('message').innerText = '終了時刻を入力してください。';
+                return;
+            }
+
+            const data = {
+                action: 'setEndTime',
+                endTime: endTime
+            };
+
+            fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    document.getElementById('message').innerText = '終了時刻が設定されました。';
+                } else {
+                    document.getElementById('message').innerText = '終了時刻の設定に失敗しました。';
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').innerText = 'エラーが発生しました。';
+                console.error('Error:', error);
+            });
+        };
+    </script>
+</body>
+</html>
