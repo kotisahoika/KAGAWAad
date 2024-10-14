@@ -2,102 +2,75 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者ページ</title>
+    <title>終了時刻設定ページ（香川県版）</title>
     <style>
         body {
-            background-color: #1a1a1a;
+            background-color: #222;
             color: white;
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
         }
-        input, button {
-            padding: 10px;
-            font-size: 1em;
-            margin: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: #333;
+        button {
+            background-color: #555;
             color: white;
-            width: 80%;
-            max-width: 300px;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #777;
         }
-        #message {
-            margin-top: 20px;
-            font-size: 1.2em;
-            color: #4CAF50;
+        input {
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: #444;
+            color: white;
+            border: 1px solid #555;
         }
-        #endTimeDiv {
-            display: none; /* 初期状態では非表示 */
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            input, button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>管理者ページ</h1>
-    <input type="password" id="passwordInput" placeholder="パスワードを入力">
-    <button id="loginButton">ログイン</button>
-    
-    <div id="endTimeDiv">
-        <h2>終了時刻を設定</h2>
-        <input type="datetime-local" id="endTimeInput">
-        <button id="setEndTimeButton">設定</button>
-    </div>
-    <div id="message"></div>
+    <h1>終了時刻設定ページ（香川県版）</h1>
+    <p>終了時刻を設定してください。</p>
+    <input type="datetime-local" id="endTimeInput">
+    <button id="setEndTimeButton">設定</button>
+    <p id="statusMessage"></p>
 
     <script>
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyElsflWXuqRAHp_6YvEC28838xcpwXu0lCL5QR6M6r4_u7EMTdetZz0HPT1co4UoSiNg/exec'; // GASのURLを設定
-        const ADMIN_PASSWORD = 'kotisahoika2008'; // 管理者用のパスワード
-
-        document.getElementById('loginButton').onclick = () => {
-            const password = document.getElementById('passwordInput').value;
-            if (password === ADMIN_PASSWORD) {
-                document.getElementById('endTimeDiv').style.display = 'block'; // 終了時刻設定フォームを表示
-                document.getElementById('message').innerText = ''; // メッセージをクリア
-            } else {
-                document.getElementById('message').innerText = 'パスワードが間違っています。'; // エラーメッセージ表示
-            }
-        };
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxu3OCRFkIaaCAxzV_a0GbV4RqSkuFJm8QfcelV6gad3j5JxUWNVZOc4WJHC-D-enYsqQ/exec';
+        const ADMIN_PASSWORD = 'kotisahoika2008';
 
         document.getElementById('setEndTimeButton').onclick = () => {
             const endTime = document.getElementById('endTimeInput').value;
-            if (!endTime) {
-                document.getElementById('message').innerText = '終了時刻を入力してください。'; // 入力エラーメッセージ表示
+            const password = prompt('管理者パスワードを入力してください:');
+
+            if (password !== ADMIN_PASSWORD) {
+                alert('パスワードが違います。');
                 return;
             }
 
-            const data = {
-                action: 'setEndTime',
-                endTime: endTime
-            };
-
             fetch(GAS_URL, {
                 method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                body: JSON.stringify({ action: 'setEndTime', endTime: endTime }),
+                headers: { 'Content-Type': 'application/json' }
             })
-            .then(response => {
-                // レスポンスの状態コードを確認
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(result => {
                 if (result.success) {
-                    document.getElementById('message').innerText = '終了時刻が設定されました。'; // 成功メッセージ表示
+                    document.getElementById('statusMessage').innerText = '終了時刻が設定されました。';
                 } else {
-                    document.getElementById('message').innerText = '終了時刻の設定に失敗しました: ' + result.error; // 失敗メッセージと詳細を表示
+                    document.getElementById('statusMessage').innerText = '設定に失敗しました。';
                 }
             })
-            .catch(error => {
-                document.getElementById('message').innerText = 'エラーが発生しました: ' + error.message; // エラーの詳細を画面に表示
+            .catch(() => {
+                document.getElementById('statusMessage').innerText = '通信エラーが発生しました。';
             });
         };
     </script>
