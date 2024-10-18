@@ -2,76 +2,72 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>終了時刻設定ページ（香川県版）</title>
+    <title>管理者ページ（香川県版）</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             background-color: #222;
             color: white;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         button {
             background-color: #555;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 10px 20px;
+            margin-top: 20px;
             cursor: pointer;
+            font-size: 1.2em;
+            border-radius: 5px;
         }
         button:hover {
             background-color: #777;
         }
-        input {
-            padding: 8px;
-            margin-bottom: 10px;
-            background-color: #444;
-            color: white;
-            border: 1px solid #555;
+        select {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1em;
         }
-        @media (max-width: 600px) {
-            body {
-                font-size: 14px;
-            }
-            input, button {
-                width: 100%;
-            }
+        p {
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
-    <h1>終了時刻設定ページ（香川県版）</h1>
-    <p>終了時刻を設定してください。</p>
-    <input type="datetime-local" id="endTimeInput">
-    <button id="setEndTimeButton">設定</button>
-    <p id="statusMessage"></p>
+    <h1>管理者ページ（香川県版）</h1>
+    <p>アイテムを使用するチームを選択してください。</p>
+
+    <select id="teamSelect">
+        <option value="チームA">チームA</option>
+        <option value="チームB">チームB</option>
+    </select>
+    <button id="sendMessageButton">メッセージ送信</button>
+
+    <p id="resultMessage"></p>
 
     <script>
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxkAa35_CB61WTybsk6DLx2Xv5kaLdVhu6_0UVO5txLwfmyfxPRZbQCQVyEnv47ziwacg/exec';
-        const ADMIN_PASSWORD = 'kotisahoika2008';
+        document.getElementById('sendMessageButton').onclick = function() {
+            const selectedTeam = document.getElementById('teamSelect').value;
 
-        document.getElementById('setEndTimeButton').onclick = () => {
-            const endTime = document.getElementById('endTimeInput').value;
-            const password = prompt('管理者パスワードを入力してください:');
-
-            if (password !== ADMIN_PASSWORD) {
-                alert('パスワードが違います。');
-                return;
-            }
-
-            fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'setEndTime', endTime: endTime }),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    document.getElementById('statusMessage').innerText = '終了時刻が設定されました。';
-                } else {
-                    document.getElementById('statusMessage').innerText = '設定に失敗しました。';
-                }
-            })
-            .catch(() => {
-                document.getElementById('statusMessage').innerText = '通信エラーが発生しました。';
-            });
+            fetch(`https://script.google.com/macros/s/AKfycbxpm3SYCrMOKEEy5y7UXtUUNgNMcmySwJ76LWw_ZwFhUitS-qYwB7zHUTZixDP9oUYBQQ/exec?action=sendItemMessage&team=${selectedTeam}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('resultMessage').innerText = "メッセージが送信されました。";
+                    } else {
+                        document.getElementById('resultMessage').innerText = "メッセージ送信に失敗しました。";
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('resultMessage').innerText = "エラーが発生しました: " + error;
+                });
         };
     </script>
 </body>
